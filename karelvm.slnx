@@ -4,6 +4,6 @@
     <Platform Name="x64" />
     <Platform Name="x86" />
   </Configurations>
-  <Project Path="carol-cpp/carol-cpp.vcxproj" />
-  <Project Path="carolvm/carolvm.csproj" />
+  <Project Path="karel-cpp/karel-cpp.vcxproj" />
+  <Project Path="karelui/karelui.csproj" />
 </Solution>

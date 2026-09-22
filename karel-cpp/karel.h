@@ -5,9 +5,9 @@ using namespace System;
 using namespace System::Numerics;
 using namespace System::Drawing;
 
-namespace carel_cpp
+namespace karel_cpp
 {
-	public ref class Carel
+	public ref class Karel
 	{
 	private:
 		Point position;
@@ -18,8 +18,8 @@ namespace carel_cpp
 		int getVectorIndex(Point point);
 
 	public:
-		Carel(Point size);
-		~Carel();
+		Karel(Point size);
+		~Karel();
 		void Move(int steps);
 		void Rotate(SByte amount);
 		void RotateLeft();

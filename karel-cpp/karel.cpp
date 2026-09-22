@@ -1,12 +1,12 @@
 using namespace System;
 using namespace System::Numerics;
 
-#include "Carel.h"
+#include "Karel.h"
 #include <cstdlib>
 
-namespace carel_cpp
+namespace karel_cpp
 {
-    Carel::Carel(Point size)
+    Karel::Karel(Point size)
     {
         this->size = size;
         this->position = Point(0, 0);
@@ -14,17 +14,17 @@ namespace carel_cpp
         this->canvas_vector = (Color*)malloc(sizeof(int) * vector_length);
     }
 
-    Carel::~Carel()
+    Karel::~Karel()
     {
         free(this->canvas_vector);
     }
 
-    int Carel::getVectorIndex(Point point)
+    int Karel::getVectorIndex(Point point)
     {
         return point.X + point.Y * this->size.X;
     }
 
-    Color Carel::GetColorBeneath()
+    Color Karel::GetColorBeneath()
     {
         int index = getVectorIndex(this->position);
 
@@ -35,22 +35,22 @@ namespace carel_cpp
         return canvas_vector[index];
     }
 
-    void Carel::Paint(Color color)
+    void Karel::Paint(Color color)
     {
         throw gcnew NotImplementedException();
     }
 
-    Point Carel::GetGridSize()
+    Point Karel::GetGridSize()
     {
         return size;
     }
 
-    Point Carel::GetPosition()
+    Point Karel::GetPosition()
     {
-        return position;
+        return this->position;
     }
 
-    Orientation Carel::GetOrientation()
+    Orientation Karel::GetOrientation()
     {
         return orientation;
     }
@@ -70,23 +70,23 @@ namespace carel_cpp
         return Point((a.X * amount), (a.Y * amount));
     }
 
-    void Carel::Move(int steps = 0)
+    void Karel::Move(int steps = 0)
     {
         position = add(this->position, scale(orientation.AsPoint(), steps));
     }
 
-    void Carel::Rotate(SByte amount)
+    void Karel::Rotate(SByte amount)
     {
         this->orientation.Rotate(amount);
     }
 
-    void Carel::RotateRight()
+    void Karel::RotateRight()
     {
         orientation.RotateLeft();
     }
 
-    void Carel::RotateLeft()
+    void Karel::RotateLeft()
     {
-        orientation.RotateLeft();
+        this->orientation.RotateLeft();
     }
 }

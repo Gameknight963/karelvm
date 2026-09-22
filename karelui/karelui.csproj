@@ -9,7 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\carol.net\carol.net.vcxproj" />
+    <ProjectReference Include="..\karel-cpp\karel-cpp.vcxproj" />
   </ItemGroup>
 
 </Project>
