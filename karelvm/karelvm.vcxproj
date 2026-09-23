@@ -140,6 +140,8 @@
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\gcr\gcr.cpp" />
+    <ClCompile Include="..\gcr\Program.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -149,6 +151,13 @@
     <ProjectReference Include="..\karelui-cpp\karelui-cpp.vcxproj">
       <Project>{4628d3aa-7060-4f22-a339-b6a5e465c755}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\gcr\colors.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\gcr\gcr.h" />
+    <ClInclude Include="..\gcr\opcodes.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
