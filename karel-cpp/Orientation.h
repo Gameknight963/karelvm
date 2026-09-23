@@ -1,18 +1,17 @@
 #pragma once
+#include <string>
+#include <cstdint>
+#include "Point.h"
 
-using namespace System;
-using namespace System::Numerics;
-using namespace System::Drawing;
-
-public value class Orientation
+class Orientation
 {
 private:
-    Byte orientation;
+    uint8_t orientation;
 
-    literal Byte north = 1;
-    literal Byte east = 2;
-    literal Byte south = 3;
-    literal Byte west = 4;
+    static const uint8_t north = 1;
+    static const uint8_t east = 2;
+    static const uint8_t south = 3;
+    static const uint8_t west = 4;
 
 public:
 
@@ -36,13 +35,13 @@ public:
         return Orientation(west);
     }
 
-    Orientation(Byte orientation);
+    Orientation(uint8_t orientation);
 
-    Byte GetOrientation();
-    Point AsPoint();
+    uint8_t GetOrientation() const;
+    Point AsPoint() const;
 
-    Orientation Rotate(SByte amount);
-    Orientation RotateLeft();
-    Orientation RotateRight();
-    virtual String^ ToString() override;
+    Orientation Rotate(int8_t amount) const;
+    Orientation RotateLeft() const;
+    Orientation RotateRight() const;
+    const char* ToString() const;
 };

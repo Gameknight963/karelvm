@@ -1,39 +1,37 @@
 #include "Orientation.h"
+#include <stdexcept>
 
-Orientation::Orientation(Byte orientation)
+Orientation::Orientation(uint8_t orientation)
 {
     if (orientation < north || orientation > west)
     {
-        throw gcnew ArgumentException("Invalid orientation.", "orientation");
+        throw std::invalid_argument("Invalid orientation");
     }
-
-    // Store zero-based so a default-initialized value is also North.
     this->orientation = orientation - 1;
 }
 
-Byte Orientation::GetOrientation()
+uint8_t Orientation::GetOrientation() const
 {
     return this->orientation + 1;
 }
 
-Orientation Orientation::Rotate(SByte amount)
+Orientation Orientation::Rotate(int8_t amount) const
 {
-    Byte result = ((this->orientation + amount) % 4 + 4) % 4 + 1;
-
+    uint8_t result = ((this->orientation + amount) % 4 + 4) % 4 + 1;
     return Orientation(result);
 }
 
-Orientation Orientation::RotateLeft()
+Orientation Orientation::RotateLeft() const
 {
     return this->Rotate(-1);
 }
 
-Orientation Orientation::RotateRight()
+Orientation Orientation::RotateRight() const
 {
     return this->Rotate(1);
 }
 
-Point Orientation::AsPoint()
+Point Orientation::AsPoint() const
 {
     switch (GetOrientation())
     {
@@ -54,7 +52,7 @@ Point Orientation::AsPoint()
     }
 }
 
-String^ Orientation::ToString()
+const char* Orientation::ToString() const
 {
     switch (GetOrientation())
     {

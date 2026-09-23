@@ -1,37 +1,44 @@
-using namespace System;
-using namespace System::Numerics;
-
+#include "Color.h"
 #include "Karel.h"
+#include <cstdint>
+#include <stdexcept>
+#include <cstdlib>
 
 namespace karel_cpp
 {
-
-    Karel::Karel(int x, int y)
+    Karel::Karel(uint32_t x, uint32_t y) :
+        position(0, 0),
+        size(x, y),
+        orientation(Orientation::East())
     {
-        if (x <= 0)
-            throw gcnew ArgumentOutOfRangeException("x", "Grid width must be positive.");
-        if (y <= 0 || static_cast<Int64>(x) * y > Int32::MaxValue)
-            throw gcnew ArgumentOutOfRangeException("y", "Grid height must be positive and the grid must fit in an array.");
-        this->size = Size(x, y);
-        this->position = Point(0, 0);
-        this->orientation = Orientation::East();
-        this->canvas_vector = gcnew array<Color>(x * y);
-        for (int i = 0; i < canvas_vector->Length; i++)
-            canvas_vector[i] = Color::White;
+        canvas_vector_length = x * y;
+        this->canvas_vector = 
+            static_cast<Color*>(
+                std::malloc(canvas_vector_length * sizeof(Color)));
+
+        if (!this->canvas_vector) throw std::bad_alloc{};
+
+        for (int i = 0; i < canvas_vector_length; ++i)
+            canvas_vector[i] = Color{ 255, 255, 255 };
     }
 
-    int Karel::getVectorIndex(int x, int y)
+    Karel::~Karel()
     {
-        if (x < 0 || x >= size.Width)
-            throw gcnew ArgumentOutOfRangeException("x");
-        if (y < 0 || y >= size.Height)
-            throw gcnew ArgumentOutOfRangeException("y");
-        return x + y * size.Width;
+        std::free(canvas_vector);
+    }
+
+    int Karel::getVectorIndex(int x, int y) const
+    {
+        if (x < 0 || x >= size.x)
+            throw std::out_of_range("x");
+        if (y < 0 || y >= size.y)
+            throw std::out_of_range("y");
+        return x + y * size.x;
     }
 
     Color Karel::GetColorBeneath()
     {
-        int index = getVectorIndex(this->position.X, this->position.Y);
+        int index = getVectorIndex(this->position.x, this->position.y);
         return canvas_vector[index];
     }
 
@@ -41,51 +48,48 @@ namespace karel_cpp
         return canvas_vector[index];
     }
 
-    void Karel::Paint(Color color)
+    void Karel::checkAndCallChanged() const
     {
-        int index = getVectorIndex(this->position.X, this->position.Y);
-        canvas_vector[index] = color;
-        Changed(this, EventArgs::Empty);
+        if (Changed) Changed();
     }
 
-    Size Karel::GetGridSize()
+    void Karel::Paint(Color color)
+    {
+        int index = getVectorIndex(this->position.x, this->position.y);
+        canvas_vector[index] = color;
+        checkAndCallChanged();
+    }
+
+    Point Karel::GetGridSize() const
     {
         return size;
     }
 
-    Point Karel::GetPosition()
+    Point Karel::GetPosition() const
     {
         return this->position;
     }
 
-    Orientation Karel::GetOrientation()
+    Orientation Karel::GetOrientation() const
     {
         return orientation;
-    }
-
-    // We need to use an overload since managed classes
-    // don't allow default arguments.
-
-    void Karel::Move()
-    {
-        Karel::Move(1);
     }
 
     void Karel::Move(int steps)
     {
         Point direction = orientation.AsPoint();
-        Int64 x = position.X + static_cast<Int64>(direction.X) * steps;
-        Int64 y = position.Y + static_cast<Int64>(direction.Y) * steps;
-        if (x < 0 || x >= size.Width || y < 0 || y >= size.Height)
-            throw gcnew InvalidOperationException("Karel cannot move outside the grid.");
-        position = Point(static_cast<int>(x), static_cast<int>(y));
-        Changed(this, EventArgs::Empty);
+        int x = position.x + direction.x * steps;
+        int y = position.y + direction.y * steps;
+        if (x < 0 || x >= size.x || y < 0 || y >= size.y)
+            throw std::logic_error("Karel doesn't know how to move outside the grid");
+        position = Point(x, y);
+        checkAndCallChanged();
     }
 
-    void Karel::Rotate(SByte amount)
+    void Karel::Rotate(int8_t amount)
     {
         this->orientation = this->orientation.Rotate(amount);
-        Changed(this, EventArgs::Empty);
+        checkAndCallChanged();
     }
 
     void Karel::RotateRight()

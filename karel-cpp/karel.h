@@ -1,33 +1,34 @@
 #pragma once
 #include "Orientation.h"
-
-using namespace System;
-using namespace System::Numerics;
-using namespace System::Drawing;
+#include "Color.h"
+#include <cstdint>
+#include <functional>
 
 namespace karel_cpp
 {
-	public ref class Karel
+	class Karel
 	{
 	private:
 		Point position;
-		Size size;
+		Point size;
 		Orientation orientation;
-		array<Color>^ canvas_vector;
-		int getVectorIndex(int x, int y);
+		Color* canvas_vector;
+		size_t canvas_vector_length;
+		int getVectorIndex(int x, int y) const;
+		void checkAndCallChanged() const;
 
 	public:
-		event EventHandler^ Changed;
-		Karel(int x, int y);
-		void Move();
-		void Move(int steps);
-		void Rotate(SByte amount);
+		std::function<void()> Changed;
+		Karel(uint32_t x, uint32_t y);
+		~Karel();
+		void Move(int steps = 1);
+		void Rotate(int8_t amount);
 		void RotateLeft();
 		void RotateRight();
 
-		Point GetPosition();
-		Size GetGridSize();
-		Orientation GetOrientation();
+		Point GetPosition() const;
+		Point GetGridSize() const;
+		Orientation GetOrientation() const;
 
 		Color GetColorBeneath();
 		Color GetColorAt(int x, int y);

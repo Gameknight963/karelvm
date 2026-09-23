@@ -7,5 +7,7 @@
   <ItemGroup>
     <ClInclude Include="Karel.h" />
     <ClInclude Include="Orientation.h" />
+    <ClInclude Include="Point.h" />
+    <ClInclude Include="Color.h" />
   </ItemGroup>
 </Project>
