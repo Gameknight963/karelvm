@@ -27,17 +27,17 @@ namespace karel_cpp
     Color Karel::GetColorBeneath()
     {
         int index = getVectorIndex(this->position);
-
-        // todo: improve error
         if (index > vector_length)
-            throw gcnew Exception("out of range");
-
+            throw gcnew Exception(String::Format("out of range: {0}", index));
         return canvas_vector[index];
     }
 
     void Karel::Paint(Color color)
     {
-        throw gcnew NotImplementedException();
+        int index = getVectorIndex(this->position);
+        if (index > vector_length)
+            throw gcnew Exception(String::Format("out of range: {0}", index));
+        canvas_vector[index] = color;
     }
 
     Point Karel::GetGridSize()
