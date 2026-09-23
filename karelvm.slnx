@@ -3,6 +3,8 @@
     <Platform Name="x64" />
     <Platform Name="x86" />
   </Configurations>
+  <Project Path="gasm/gasm.csproj" />
+  <Project Path="gcr/gcr.vcxproj" Id="2565acae-7ac6-44e4-befb-b0092e9b1c80" />
   <Project Path="karel-cpp/karel-cpp.vcxproj" Id="a10e23ec-247c-9b82-a261-b5b08c26bf9d" />
   <Project Path="karelui/karelui.csproj">
     <Platform Solution="*|x64" Project="x64" />
