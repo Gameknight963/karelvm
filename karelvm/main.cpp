@@ -21,6 +21,11 @@ static bool Tick()
     return true;
 }
 
+std::wstring ToWide(const char* str)
+{
+    return std::wstring(str, str + strlen(str)).c_str();
+}
+
 int main()
 {
     //HANDLE handle = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -37,7 +42,12 @@ int main()
     }
     catch (const std::exception& error)
     {
-        std::cerr << error.what() << '\n';
+        MessageBoxA(
+            nullptr, 
+            error.what(),
+            "error",
+            0);
+
         return 1;
     }
 }
