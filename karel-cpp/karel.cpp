@@ -55,17 +55,17 @@ namespace karel_cpp
         return orientation;
     }
 
-    Point add(Point a, Point b)
+    static Point add(Point a, Point b)
     {
         return Point((a.X + b.X), (a.Y + b.Y));
     }
 
-    Point multiply(Point a, Point b)
+    static Point multiply(Point a, Point b)
     {
         return Point((a.X * b.X), (a.Y * b.Y));
     }
 
-    Point scale(Point a, int amount)
+    static Point scale(Point a, int amount)
     {
         return Point((a.X * amount), (a.Y * amount));
     }
