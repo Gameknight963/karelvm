@@ -20,6 +20,7 @@ namespace karel_cpp
 	public:
 		Karel(Point size);
 		~Karel();
+		void Move();
 		void Move(int steps);
 		void Rotate(SByte amount);
 		void RotateLeft();

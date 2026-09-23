@@ -70,7 +70,15 @@ namespace karel_cpp
         return Point((a.X * amount), (a.Y * amount));
     }
 
-    void Karel::Move(int steps = 0)
+    // We need to use an overload since managed classes
+    // don't allow default arguments.
+
+    void Karel::Move()
+    {
+        Karel::Move(1);
+    }
+
+    void Karel::Move(int steps)
     {
         position = add(this->position, scale(orientation.AsPoint(), steps));
     }
