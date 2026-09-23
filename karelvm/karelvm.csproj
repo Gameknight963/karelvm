@@ -1,18 +1,19 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <OutputType>Library</OutputType>
+    <OutputType>WinExe</OutputType>
     <TargetFramework>net10.0-windows</TargetFramework>
-    <Nullable>enable</Nullable>
-    <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
     <Platforms>x64;x86</Platforms>
     <PlatformTarget Condition="'$(Platform)' != 'x86'">x64</PlatformTarget>
     <PlatformTarget Condition="'$(Platform)' == 'x86'">x86</PlatformTarget>
+	<UseWindowsForms>true</UseWindowsForms>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\karel-cpp\karel-cpp.vcxproj" />
+    <ProjectReference Include="..\karelui\karelui.csproj" />
   </ItemGroup>
 
 </Project>

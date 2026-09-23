@@ -1,9 +1,15 @@
 <Solution>
   <Configurations>
-    <Platform Name="Any CPU" />
     <Platform Name="x64" />
     <Platform Name="x86" />
   </Configurations>
   <Project Path="karel-cpp/karel-cpp.vcxproj" Id="a10e23ec-247c-9b82-a261-b5b08c26bf9d" />
-  <Project Path="karelui/karelui.csproj" />
+  <Project Path="karelui/karelui.csproj">
+    <Platform Solution="*|x64" Project="x64" />
+    <Platform Solution="*|x86" Project="x86" />
+  </Project>
+  <Project Path="karelvm/karelvm.csproj" Id="ee12ff5a-d80a-4b70-8996-a9a9aa9d1f4c">
+    <Platform Solution="*|x64" Project="x64" />
+    <Platform Solution="*|x86" Project="x86" />
+  </Project>
 </Solution>

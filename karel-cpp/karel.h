@@ -11,15 +11,14 @@ namespace karel_cpp
 	{
 	private:
 		Point position;
-		Point size;
+		Size size;
 		Orientation orientation;
-		Color* canvas_vector;
-		int vector_length;
-		int getVectorIndex(Point point);
+		array<Color>^ canvas_vector;
+		int getVectorIndex(int x, int y);
 
 	public:
-		Karel(Point size);
-		~Karel();
+		event EventHandler^ Changed;
+		Karel(int x, int y);
 		void Move();
 		void Move(int steps);
 		void Rotate(SByte amount);
@@ -27,10 +26,11 @@ namespace karel_cpp
 		void RotateRight();
 
 		Point GetPosition();
-		Point GetGridSize();
+		Size GetGridSize();
 		Orientation GetOrientation();
 
 		Color GetColorBeneath();
+		Color GetColorAt(int x, int y);
 		void Paint(Color color);
 	};
 }

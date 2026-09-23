@@ -7,24 +7,25 @@ Orientation::Orientation(Byte orientation)
         throw gcnew ArgumentException("Invalid orientation.", "orientation");
     }
 
-    this->orientation = orientation;
+    // Store zero-based so a default-initialized value is also North.
+    this->orientation = orientation - 1;
 }
 
 Byte Orientation::GetOrientation()
 {
-    return this->orientation;
+    return this->orientation + 1;
 }
 
 Orientation Orientation::Rotate(SByte amount)
 {
-    Byte result = ((this->orientation - 1 + amount - 1) % 4) + 1;
+    Byte result = ((this->orientation + amount) % 4 + 4) % 4 + 1;
 
     return Orientation(result);
 }
 
 Orientation Orientation::RotateLeft()
 {
-    return this->Rotate(1);
+    return this->Rotate(-1);
 }
 
 Orientation Orientation::RotateRight()
@@ -34,19 +35,19 @@ Orientation Orientation::RotateRight()
 
 Point Orientation::AsPoint()
 {
-    switch (this->orientation)
+    switch (GetOrientation())
     {
     case north:
-        return Point(0, 1);
-
-    case east:
-        return Point(-1, 0);
-
-    case south:
         return Point(0, -1);
 
-    case west:
+    case east:
         return Point(1, 0);
+
+    case south:
+        return Point(0, 1);
+
+    case west:
+        return Point(-1, 0);
 
     default:
         return Point(0, 0);
@@ -55,7 +56,7 @@ Point Orientation::AsPoint()
 
 String^ Orientation::ToString()
 {
-    switch (this->orientation)
+    switch (GetOrientation())
     {
     case north:
         return "North";
