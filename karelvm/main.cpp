@@ -21,13 +21,9 @@ static bool Tick()
     return true;
 }
 
-std::wstring ToWide(const char* str)
-{
-    return std::wstring(str, str + strlen(str)).c_str();
-}
-
 int main()
 {
+    // to enable virtual processing, uncomment:
     //HANDLE handle = GetStdHandle(STD_OUTPUT_HANDLE);
     //DWORD mode = 0;
     //GetConsoleMode(handle, &mode);

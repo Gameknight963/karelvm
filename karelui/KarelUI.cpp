@@ -205,7 +205,10 @@ LRESULT CALLBACK KarelUI::WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM
         auto* This = reinterpret_cast<KarelUI*>(
             GetWindowLongPtrW(hwnd, GWLP_USERDATA));
         if (This && This->onTick)
-            This->onTick();
+        {
+            if (!This->onTick())
+                DestroyWindow(hwnd);
+        }
         return 0;
     }
 
