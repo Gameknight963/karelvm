@@ -18,6 +18,8 @@ KarelUI::KarelUI(
     int squareSize,
     int tickRateMs)
 {
+    if (tickRateMs <= 0)
+        throw std::invalid_argument("tick interval must be positive");
     this->karel = new Karel(x, y);
     this->squareSize = squareSize;
     this->tickRateMs = tickRateMs;
@@ -88,11 +90,6 @@ int KarelUI::Show()
         );
     }
 
-    if (!SetTimer(hwnd, 1, tickRateMs, nullptr))
-    {
-        throw std::runtime_error("SetTimer failed");
-    }
-
     karel->Changed = [hwnd] { InvalidateRect(hwnd, nullptr, FALSE); };
 
     if (initialize)
@@ -101,6 +98,11 @@ int KarelUI::Show()
     }
 
     ShowWindow(hwnd, SW_SHOWNORMAL);
+
+    lastTickTime = std::chrono::steady_clock::now();
+    tickDebtMs = 0;
+    if (!SetTimer(hwnd, 1, 10, nullptr))
+        throw std::runtime_error("SetTimer failed");
 
     MSG msg{};
 
@@ -224,18 +226,67 @@ LRESULT CALLBACK KarelUI::WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM
         return 0;
     }
 
+    // messageboxes are modal dialogs and disable their owner, discard time spent paused
+    if (message == WM_ENABLE)
+    {
+        auto* This = reinterpret_cast<KarelUI*>(GetWindowLongPtrW(hwnd, GWLP_USERDATA));
+        if (This)
+        {
+            This->lastTickTime = std::chrono::steady_clock::now();
+            This->tickDebtMs = 0;
+            This->timingInterrupted = This->ticking;
+        }
+    }
+
     if (message == WM_TIMER && wParam == 1)
     {
         auto* This = reinterpret_cast<KarelUI*>(
             GetWindowLongPtrW(hwnd, GWLP_USERDATA));
-        if (This && This->onTick && !This->ticking)
+        if (This && This->onTick)
         {
-            This->ticking = true;
-            const bool keepRunning = This->onTick();
-            This->ticking = false;
+            using Clock = std::chrono::steady_clock;
+            const auto now = Clock::now();
+            if (This->ticking || !IsWindowEnabled(hwnd))
+            {
+                // a nested message loop must not execute ticks or accumulate debt
+                This->lastTickTime = now;
+                This->tickDebtMs = 0;
+                This->timingInterrupted = This->ticking;
+                return 0;
+            }
 
-            if (!keepRunning)
-                DestroyWindow(hwnd);
+            This->tickDebtMs += std::chrono::duration<double, std::milli>(
+                now - This->lastTickTime).count();
+            This->lastTickTime = now;
+            This->timingInterrupted = false;
+            This->ticking = true;
+            struct TickGuard
+            {
+                bool& ticking;
+                ~TickGuard() { ticking = false; }
+            } guard{ This->ticking };
+
+            // leave the message loop time to paint and respond to input
+            const auto deadline = now + std::chrono::milliseconds(4);
+            while (This->tickDebtMs >= This->tickRateMs)
+            {
+                This->tickDebtMs -= This->tickRateMs;
+                if (!This->onTick())
+                {
+                    DestroyWindow(hwnd);
+                    break;
+                }
+                if (!IsWindow(hwnd))
+                    break;
+                if (This->timingInterrupted)
+                {
+                    This->lastTickTime = Clock::now();
+                    This->tickDebtMs = 0;
+                    break;
+                }
+                if (Clock::now() >= deadline)
+                    break;
+            }
         }
         return 0;
     }

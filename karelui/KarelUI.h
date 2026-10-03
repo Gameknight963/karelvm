@@ -2,6 +2,7 @@
 #include <windows.h>
 #include "../karel-cpp/karel.h"
 #include <cstdint>
+#include <chrono>
 
 class KarelUI
 {
@@ -14,6 +15,10 @@ private:
 	std::function<bool()> onTick;
 	std::function<bool()> initialize = nullptr;
 	bool ticking = false;
+	bool timingInterrupted = false;
+	std::chrono::steady_clock::time_point lastTickTime{};
+	double tickDebtMs = 0;
+	// Requested interval between instructions, independent of the UI timer.
 	int tickRateMs = 50;
 	HWND hwnd = nullptr;
 public:
