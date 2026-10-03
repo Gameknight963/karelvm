@@ -17,7 +17,7 @@ vm that runs on Karel
 
 ### 24 bit quirk due to the constraints
 
-karelvm natively uses 24 bit integers. This is because colors have 3 8-bit channels (R, G, and B), and that can be abused to hold a 24-bit integer. 
+karelvm natively uses 24 bit integers. This is because colors have three 8-bit channels (R, G, and B), and that can be abused to hold a 24-bit integer. 
 
 An 8 bit integer would also work nicely if you split it across all 3 channels. karelvm actually used to do that, problem is that it just gives you so little addressable memory to work with. 
 
