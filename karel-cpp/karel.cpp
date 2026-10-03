@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <stdexcept>
 #include <cstdlib>
+#include <format>
 
 namespace karel_cpp
 {
@@ -81,7 +82,7 @@ namespace karel_cpp
         int x = position.x + direction.x * steps;
         int y = position.y + direction.y * steps;
         if (x < 0 || x >= size.x || y < 0 || y >= size.y)
-            throw std::logic_error("Karel doesn't know how to move outside the grid");
+            throw std::logic_error(std::format("attempted to move to ({}, {})", x, y));
         position = Point(x, y);
         checkAndCallChanged();
     }
@@ -100,5 +101,11 @@ namespace karel_cpp
     void Karel::RotateLeft()
     {
         Rotate(-1);
+    }
+
+    void Karel::Face(Orientation where)
+    {
+        this->orientation = where;
+        checkAndCallChanged();
     }
 }

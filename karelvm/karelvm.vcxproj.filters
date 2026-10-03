@@ -3,4 +3,9 @@
   <ItemGroup>
     <ClCompile Include="main.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="program.h" />
+    <ClInclude Include="instruction.h" />
+    <ClInclude Include="reg.h" />
+  </ItemGroup>
 </Project>

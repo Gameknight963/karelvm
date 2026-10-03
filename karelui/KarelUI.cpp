@@ -68,6 +68,8 @@ int KarelUI::Show()
         this
     );
 
+    this->hwnd = hwnd;
+
     if (!hwnd)
     {
         DWORD error = GetLastError();
@@ -102,6 +104,11 @@ int KarelUI::Show()
 Karel* KarelUI::GetKarel() const
 {
     return karel;
+}
+
+HWND KarelUI::GetHwnd() const
+{
+    return this->hwnd;
 }
 
 void KarelUI::Draw(HDC dc) const
@@ -206,9 +213,13 @@ LRESULT CALLBACK KarelUI::WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM
     {
         auto* This = reinterpret_cast<KarelUI*>(
             GetWindowLongPtrW(hwnd, GWLP_USERDATA));
-        if (This && This->onTick)
+        if (This && This->onTick && !This->ticking)
         {
-            if (!This->onTick())
+            This->ticking = true;
+            const bool keepRunning = This->onTick();
+            This->ticking = false;
+
+            if (!keepRunning)
                 DestroyWindow(hwnd);
         }
         return 0;

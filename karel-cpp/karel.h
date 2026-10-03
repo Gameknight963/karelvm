@@ -25,6 +25,7 @@ namespace karel_cpp
 		void Rotate(int8_t amount);
 		void RotateLeft();
 		void RotateRight();
+		void Face(Orientation where);
 
 		Point GetPosition() const;
 		Point GetGridSize() const;
