@@ -311,7 +311,7 @@ int main()
 
     try
     {
-        karelui = new KarelUI(GRID_SIZE_X, GRID_SIZE_Y, Tick, initialize, 20, 200);
+        karelui = new KarelUI(GRID_SIZE_X, GRID_SIZE_Y, Tick, initialize, 20, 10);
         karel = karelui->GetKarel();
         return karelui->Show();
     }
