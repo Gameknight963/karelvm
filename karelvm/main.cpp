@@ -88,24 +88,36 @@ static void write_register(reg r, uint32_t value)
     write_cell(value);
 }
 
-static void push_stack(reg r)
+static void push_stack(int32_t value)
 {
     uint32_t sp = read_register(reg::sp);
     if (sp <= PROGRAM_CELLS || sp > MAX_ADDRESS)
         throw vm_fault("stack overflow");
-    uint32_t value = read_register(r);
-    write_address(--sp, value);
+
+    write_address(--sp, static_cast<uint32_t>(value));
     // stack grows downwards
     write_register(reg::sp, sp);
 }
 
-static void pop_stack(reg r)
+static void push_stack(reg r)
+{
+    push_stack(read_register(r));
+}
+
+static uint32_t pop_stack()
 {
     uint32_t sp = read_register(reg::sp);
     if (sp < PROGRAM_CELLS || sp >= MAX_ADDRESS)
         throw vm_fault("stack underflow");
+
     uint32_t value = read_address(sp);
     write_register(reg::sp, sp + 1);
+    return value;
+}
+
+static void pop_stack(reg r)
+{
+    uint32_t value = pop_stack();
     write_register(r, value);
 }
 
@@ -233,6 +245,23 @@ static bool Tick()
             int64_t product = static_cast<int64_t>(a) / b;
             write_register(ra, static_cast<uint32_t>(product & 0xFFFFFFu));
             write_register(rb, static_cast<uint32_t>((product >> 24) & 0xFFFFFFu));
+            break;
+        }
+        case instruction::JMP:
+        {
+            ip = fetch_word();
+            break;
+        }
+        case instruction::CALL:
+        {
+            uint32_t target = fetch_word();
+            push_stack(ip); // now points to the next instruction
+            ip = target;
+            break;
+        }
+        case instruction::RET:
+        {
+            ip = pop_stack();
             break;
         }
         default:

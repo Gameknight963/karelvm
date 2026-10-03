@@ -16,7 +16,9 @@
 #define SUB(ra, rb) static_cast<uint8_t>(instruction::SUB), static_cast<uint8_t>(reg::ra), static_cast<uint8_t>(reg::rb),
 #define MULT(ra, rb) static_cast<uint8_t>(instruction::MULT), static_cast<uint8_t>(reg::ra), static_cast<uint8_t>(reg::rb),
 #define DIV(ra, rb) static_cast<uint8_t>(instruction::DIV), static_cast<uint8_t>(reg::ra), static_cast<uint8_t>(reg::rb),
-
+#define JMP(target) static_cast<uint8_t>(instruction::JMP), U24_BYTES(target),
+#define CALL(target) static_cast<uint8_t>(instruction::CALL), U24_BYTES(target),
+#define RET() static_cast<uint8_t>(instruction::RET),
 
 constexpr uint8_t program[] = {
     MOV(s0, 2112)

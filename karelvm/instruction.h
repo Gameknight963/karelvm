@@ -35,4 +35,13 @@ enum class instruction : uint32_t
 	// bits in the first register and the high 24 bits in the second
 	// faults on division by 0
 	DIV = 0x09,
+
+	// jumps to the following word
+	JMP = 0x0A,
+
+	// pushes the return address, then jumps to the following word
+	CALL = 0x0B,
+
+	// pops the stack and jumps to that address
+	RET = 0x0C,
 };
