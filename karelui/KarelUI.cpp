@@ -58,7 +58,7 @@ int KarelUI::Show()
         0,
         L"KarelWindow", // Our registered window class
         L"Karel", // Title bar text
-        WS_OVERLAPPEDWINDOW,
+        WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX,
         CW_USEDEFAULT,
         CW_USEDEFAULT,
         bounds.right - bounds.left, bounds.bottom - bounds.top,
