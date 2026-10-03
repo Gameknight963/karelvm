@@ -7,5 +7,6 @@
     <ClInclude Include="program.h" />
     <ClInclude Include="instruction.h" />
     <ClInclude Include="reg.h" />
+    <ClInclude Include="vm_fault.h" />
   </ItemGroup>
 </Project>

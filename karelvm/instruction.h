@@ -20,4 +20,19 @@ enum class instruction : uint32_t
 
 	// treat the next byte as a register, and pop the top of the stack into it
 	POP = 0x05,
+
+	// treat the next two bytes as registers, add them, and put the result in the first one
+	ADD = 0x06,
+
+	// treat the next two bytes as registers, subtract them, and put the result in the first one
+	SUB = 0x07,
+
+	// treat the next two bytes as registers, multiply their values, and store the low 24 bits in
+	// the first register and the high 24 bits in the second
+	MULT = 0x08,
+
+	// treat the next two bytes as registers, integer divide their values, and store the low 24
+	// bits in the first register and the high 24 bits in the second
+	// faults on division by 0
+	DIV = 0x09,
 };

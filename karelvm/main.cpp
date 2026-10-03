@@ -2,6 +2,7 @@
 #include "reg.h"
 #include "instruction.h"
 #include "program.h"
+#include "vm_fault.h"
 #include <exception>
 #include <iostream>
 #include <cstdint>
@@ -50,7 +51,7 @@ static void write_cell(uint32_t value)
 static void karel_goto_address(uint32_t karelptr)
 {
     if (karelptr >= MAX_ADDRESS)
-        throw std::out_of_range("memory address outside the grid");
+        throw vm_fault("memory address outside the grid");
     uint32_t index = karelptr + REGISTER_ADDRESSES;
     int x = index % karel->GetGridSize().x;
     int y = index / karel->GetGridSize().x;
@@ -73,7 +74,7 @@ static uint32_t read_register(reg r)
 {
     uint32_t index = static_cast<uint32_t>(r);
     if (index >= REGISTER_ADDRESSES)
-        throw std::out_of_range("invalid register");
+        throw vm_fault("invalid register");
     karel_goto(index % GRID_SIZE_X, index / GRID_SIZE_X);
     return read_cell();
 }
@@ -82,7 +83,7 @@ static void write_register(reg r, uint32_t value)
 {
     uint32_t index = static_cast<uint32_t>(r);
     if (index >= REGISTER_ADDRESSES)
-        throw std::out_of_range("invalid register");
+        throw vm_fault("invalid register");
     karel_goto(index % GRID_SIZE_X, index / GRID_SIZE_X);
     write_cell(value);
 }
@@ -91,7 +92,7 @@ static void push_stack(reg r)
 {
     uint32_t sp = read_register(reg::sp);
     if (sp <= PROGRAM_CELLS || sp > MAX_ADDRESS)
-        throw std::out_of_range("stack overflow");
+        throw vm_fault("stack overflow");
     uint32_t value = read_register(r);
     write_address(--sp, value);
     // stack grows downwards
@@ -102,7 +103,7 @@ static void pop_stack(reg r)
 {
     uint32_t sp = read_register(reg::sp);
     if (sp < PROGRAM_CELLS || sp >= MAX_ADDRESS)
-        throw std::out_of_range("stack underflow");
+        throw vm_fault("stack underflow");
     uint32_t value = read_address(sp);
     write_register(reg::sp, sp + 1);
     write_register(r, value);
@@ -111,7 +112,7 @@ static void pop_stack(reg r)
 static uint8_t fetch_byte()
 {
     if (ip >= PROGRAM_BYTES)
-        throw std::out_of_range("unexpected end of bytecode");
+        throw vm_fault("unexpected end of bytecode");
     uint32_t cell = read_address(ip / 3);
     uint8_t byte = static_cast<uint8_t>(cell >> ((ip % 3) * 8));
     ++ip;
@@ -190,6 +191,50 @@ static bool Tick()
             pop_stack(r);
             break;
         }
+        case instruction::ADD:
+        {
+            reg ra = static_cast<reg>(fetch_byte());
+            reg rb = static_cast<reg>(fetch_byte());
+            int32_t a = read_register(ra);
+            int32_t b = read_register(rb);
+            write_register(ra, a + b);
+            break;
+        }
+        case instruction::SUB:
+        {
+            reg ra = static_cast<reg>(fetch_byte());
+            reg rb = static_cast<reg>(fetch_byte());
+            int32_t a = read_register(ra);
+            int32_t b = read_register(rb);
+            write_register(ra, a - b);
+            break;
+        }
+        case instruction::MULT:
+        {
+            reg ra = static_cast<reg>(fetch_byte());
+            reg rb = static_cast<reg>(fetch_byte());
+            int32_t a = read_register(ra);
+            int32_t b = read_register(rb);
+            int64_t product = static_cast<int64_t>(a) * b;
+            write_register(ra, static_cast<uint32_t>(product & 0xFFFFFFu));
+            write_register(rb, static_cast<uint32_t>((product >> 24) & 0xFFFFFFu));
+            break;
+        }
+        case instruction::DIV:
+        {
+            reg ra = static_cast<reg>(fetch_byte());
+            reg rb = static_cast<reg>(fetch_byte());
+            int32_t a = read_register(ra);
+            int32_t b = read_register(rb);
+            if (b == 0)
+            {
+                throw vm_fault("division by zero");
+            }
+            int64_t product = static_cast<int64_t>(a) / b;
+            write_register(ra, static_cast<uint32_t>(product & 0xFFFFFFu));
+            write_register(rb, static_cast<uint32_t>((product >> 24) & 0xFFFFFFu));
+            break;
+        }
         default:
         {
             std::ostringstream message;
@@ -220,6 +265,11 @@ int main()
         karelui = new KarelUI(GRID_SIZE_X, GRID_SIZE_Y, Tick, initialize, 20, 200);
         karel = karelui->GetKarel();
         return karelui->Show();
+    }
+    catch (const vm_fault& fault)
+    {
+        MessageBoxA(karelui->GetHwnd(), (fault.what()), "VM fault", MB_OK);
+        return 1;
     }
     catch (const std::exception& error)
     {

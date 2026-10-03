@@ -156,6 +156,7 @@
     <ClInclude Include="instruction.h" />
     <ClInclude Include="program.h" />
     <ClInclude Include="reg.h" />
+    <ClInclude Include="vm_fault.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
