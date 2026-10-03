@@ -111,9 +111,24 @@ static bool initialize()
     return true;
 }
 
+static uint8_t fetch_byte()
+{
+    if (ip >= sizeof(program))
+        throw std::out_of_range("unexpected end of bytecode");
+    return program[ip++];
+}
+
+static uint32_t fetch_word()
+{
+    uint32_t low = fetch_byte();
+    uint32_t middle = fetch_byte();
+    uint32_t high = fetch_byte();
+    return low | (middle << 8) | (high << 16);
+}
+
 static bool Tick()
 {
-    uint32_t current = program[ip];
+    uint8_t current = fetch_byte();
     switch ((instruction)current)
     {
         case instruction::EXIT:
@@ -134,20 +149,20 @@ static bool Tick()
         }
         case instruction::MOV:
         {
-            reg r = (reg)program[++ip];
-            uint32_t value = program[++ip];
+            reg r = static_cast<reg>(fetch_byte());
+            uint32_t value = fetch_word();
             write_register(r, value);
             break;
         }
         case instruction::PUSH:
         {
-            reg r = (reg)program[++ip];
+            reg r = static_cast<reg>(fetch_byte());
             push_stack(r);
             break;
         }
         case instruction::POP:
         {
-            reg r = (reg)program[++ip];
+            reg r = static_cast<reg>(fetch_byte());
             pop_stack(r);
             break;
         }
@@ -156,7 +171,7 @@ static bool Tick()
             std::ostringstream message;
             message << "unknown instruction: 0x"
                 << std::hex << std::uppercase << std::setfill('0')
-                << std::setw(6) << current;
+                << std::setw(2) << static_cast<unsigned int>(current);
             MessageBoxA(
                 nullptr,
                 message.str().c_str(),
@@ -165,7 +180,6 @@ static bool Tick()
             return false;
         }
     }
-    ip++;
     return true;
 }
 

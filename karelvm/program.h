@@ -2,29 +2,27 @@
 #include "instruction.h"
 #include "reg.h"
 
-// who cares
-uint32_t program[100] =
-{
-	//// mov a0, 5
-	//(uint32_t)instruction::MOV,
-	//(uint32_t)reg::a0,
-	//5,
+#define U24_BYTES(value) \
+    static_cast<uint8_t>(uint32_t(value)), \
+    static_cast<uint8_t>(uint32_t(value) >> 8), \
+    static_cast<uint8_t>(uint32_t(value) >> 16)
+#define MOV(destination, value) static_cast<uint8_t>(instruction::MOV), static_cast<uint8_t>(reg::destination), U24_BYTES(value),
+#define PUSH(source) static_cast<uint8_t>(instruction::PUSH), static_cast<uint8_t>(reg::source),
+#define POP(destination) static_cast<uint8_t>(instruction::POP), static_cast<uint8_t>(reg::destination),
+#define READ() static_cast<uint8_t>(instruction::READ),
+#define WRITE() static_cast<uint8_t>(instruction::WRITE),
+#define EXIT() static_cast<uint8_t>(instruction::EXIT),
 
-	//// mov a1, 44
-	//(uint32_t)instruction::MOV,
-	//(uint32_t)reg::a1,
-	//44,
-
-	//(uint32_t)instruction::WRITE,
-
-	// mov s0, 24
-	(uint32_t)instruction::MOV,
-	(uint32_t)reg::s0,
-	0xAAB440,
-
-	// push s0
-	(uint32_t)instruction::PUSH,
-	(uint32_t)reg::s0,
-
-	(uint32_t)instruction::EXIT
+constexpr uint8_t program[] = {
+    MOV(s0, 0xAAB440)
+    PUSH(s0)
+    EXIT()
 };
+
+#undef MOV
+#undef PUSH
+#undef POP
+#undef READ
+#undef WRITE
+#undef EXIT
+#undef U24_BYTES

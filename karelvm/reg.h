@@ -2,7 +2,7 @@
 #include <cstdint>
 
 // represents karel "memory addresses" which are "registers"
-enum class reg : uint32_t
+enum class reg : uint8_t
 {
     // argument 0
     a0 = 0x00,
