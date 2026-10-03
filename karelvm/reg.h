@@ -1,7 +1,8 @@
 #pragma once
+#include <cstdint>
 
 // represents karel "memory addresses" which are "registers"
-enum class reg : char
+enum class reg : uint32_t
 {
     // argument 0
     a0 = 0x00,
