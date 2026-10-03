@@ -25,6 +25,6 @@ uint8_t program[100] =
 	// push s0
 	(uint8_t)instruction::PUSH,
 	(uint8_t)reg::s0,
-
+	(uint8_t)instruction::PUSH,
 	(uint8_t)instruction::EXIT
 };

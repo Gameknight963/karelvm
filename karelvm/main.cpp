@@ -15,7 +15,7 @@ static int ip = 0;
 static Karel* karel;
 
 constexpr int REGISTER_ADDRESSES = 16;
-constexpr int GRID_SIZE_X = 10;
+constexpr int GRID_SIZE_X = 9;
 constexpr int GRID_SIZE_Y = 10;
 constexpr int MAX_ADDRESS = GRID_SIZE_X * GRID_SIZE_Y * 3 - REGISTER_ADDRESSES;
 
@@ -33,7 +33,7 @@ static void karel_goto_address(int karelptr)
 {
     int index = (karelptr + REGISTER_ADDRESSES) / 3;
     int x = index % karel->GetGridSize().x;
-    int y = index / karel->GetGridSize().y;
+    int y = index / karel->GetGridSize().x;
     karel_goto(x, y);
 }
 
@@ -70,16 +70,16 @@ static void write_register(reg r, uint8_t value)
 static void push_stack(reg r)
 {
     uint8_t sp = read_register(reg::sp);
-    write_address(sp, read_register(r));
+    write_address(--sp, read_register(r));
     // stack grows downwards
-    write_register(reg::sp, sp - 8);
+    write_register(reg::sp, sp - 1);
 }
 
 static void pop_stack(reg r)
 {
     uint8_t sp = read_register(reg::sp);
     write_register(r, read_address(sp));
-    write_register(reg::sp, sp + 8);
+    write_register(reg::sp, sp + 1);
 }
 
 static bool initialize()
