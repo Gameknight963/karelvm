@@ -23,6 +23,9 @@ constexpr uint32_t PROGRAM_BYTES = sizeof(program);
 constexpr uint32_t PROGRAM_CELLS = (PROGRAM_BYTES + 2) / 3;
 static_assert(PROGRAM_CELLS <= MAX_ADDRESS, "program does not fit in Karel memory");
 
+constexpr int CELL_SIZE = 20;
+constexpr int TICK_RATE = 1;
+
 static void karel_goto(int x, int y)
 {
     Point pos = karel->GetPosition();
@@ -311,7 +314,7 @@ int main()
 
     try
     {
-        karelui = new KarelUI(GRID_SIZE_X, GRID_SIZE_Y, Tick, initialize, 20, 1);
+        karelui = new KarelUI(GRID_SIZE_X, GRID_SIZE_Y, Tick, initialize, CELL_SIZE, TICK_RATE);
         karel = karelui->GetKarel();
         return karelui->Show();
     }
