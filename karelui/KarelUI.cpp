@@ -1,6 +1,8 @@
 #include <windows.h>
 #include "KarelUI.h"
-#include "Karel.h"
+#include "../karel-cpp/karel.h"
+#include "../karel-cpp/Color.h"
+#include "../karel-cpp/ColorToColorRef.h"
 #include <cstdint>
 #include <system_error>
 #include <functional>

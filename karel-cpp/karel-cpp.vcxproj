@@ -125,6 +125,7 @@
     <ClInclude Include="Karel.h" />
     <ClInclude Include="Orientation.h" />
     <ClInclude Include="Point.h" />
+    <ClInclude Include="ColorToColorRef.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

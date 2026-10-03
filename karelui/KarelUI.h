@@ -1,6 +1,6 @@
 #pragma once
 #include <windows.h>
-#include "Karel.h"
+#include "../karel-cpp/karel.h"
 #include <cstdint>
 
 class KarelUI
