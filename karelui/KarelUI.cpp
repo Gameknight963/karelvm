@@ -12,15 +12,17 @@
 using namespace karel_cpp;
 
 KarelUI::KarelUI(
-    int x, int y, 
-    std::function<bool()> onTick, 
-    int squareSize = 20,
-    int tickRateMs = 50)
+    int x, int y,
+    std::function<bool()> onTick,
+    std::function<bool()> initialize,
+    int squareSize,
+    int tickRateMs)
 {
     this->karel = new Karel(x, y);
     this->squareSize = squareSize;
     this->tickRateMs = tickRateMs;
     this->onTick = onTick;
+    this->initialize = initialize;
 
     if (isInitialized) return;
     isInitialized = true;
@@ -40,6 +42,13 @@ KarelUI::KarelUI(
         );
     }
 }
+
+KarelUI::KarelUI(
+    int x, int y,
+    std::function<bool()> onTick,
+    int squareSize = 20,
+    int tickRateMs = 50) : 
+    KarelUI(x, y, onTick, nullptr, squareSize, tickRateMs) {}
 
 KarelUI::~KarelUI()
 {
@@ -79,12 +88,18 @@ int KarelUI::Show()
         );
     }
 
-    if (SetTimer(hwnd, 1, tickRateMs, nullptr) == 0)
+    if (!SetTimer(hwnd, 1, tickRateMs, nullptr))
     {
         throw std::runtime_error("SetTimer failed");
     }
 
     karel->Changed = [hwnd] { InvalidateRect(hwnd, nullptr, FALSE); };
+
+    if (initialize)
+    {
+        if (!initialize()) return 0;
+    }
+
     ShowWindow(hwnd, SW_SHOWNORMAL);
 
     MSG msg{};

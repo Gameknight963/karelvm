@@ -14,7 +14,10 @@ static KarelUI* karelui = nullptr;
 static int ip = 0;
 static Karel* karel;
 
-constexpr int RESERVED_ADDRESSES = 16;
+constexpr int REGISTER_ADDRESSES = 16;
+constexpr int GRID_SIZE_X = 10;
+constexpr int GRID_SIZE_Y = 10;
+constexpr int MAX_ADDRESS = GRID_SIZE_X * GRID_SIZE_Y * 3 - REGISTER_ADDRESSES;
 
 static void karel_goto(int x, int y)
 {
@@ -28,7 +31,7 @@ static void karel_goto(int x, int y)
 
 static void karel_goto_address(int karelptr)
 {
-    int index = (karelptr + RESERVED_ADDRESSES) / 3;
+    int index = (karelptr + REGISTER_ADDRESSES) / 3;
     int x = index % karel->GetGridSize().x;
     int y = index / karel->GetGridSize().y;
     karel_goto(x, y);
@@ -37,59 +40,92 @@ static void karel_goto_address(int karelptr)
 static uint8_t read_address(int karelptr)
 {
     karel_goto_address(karelptr);
-    return karel->GetColorBeneath()[(karelptr + RESERVED_ADDRESSES) % 3];
+    return karel->GetColorBeneath()[(karelptr + REGISTER_ADDRESSES) % 3];
 }
 
 static void write_address(int karelptr, uint8_t value)
 {
     karel_goto_address(karelptr);
     Color c = karel->GetColorBeneath();
-    c[(karelptr + RESERVED_ADDRESSES) % 3] = value;
+    c[(karelptr + REGISTER_ADDRESSES) % 3] = value;
     karel->Paint(c);
 }
 
-static uint8_t read_register(reg reg)
+static uint8_t read_register(reg r)
 {
-    int address = (int)reg / 3;
+    int address = (int)r / 3;
     karel_goto(address, 0);
-    return karel->GetColorBeneath()[(int)reg % 3];
+    return karel->GetColorBeneath()[(int)r % 3];
 }
 
-static void write_register(reg reg, uint8_t value)
+static void write_register(reg r, uint8_t value)
 {
-    int address = (int)reg / 3;
+    int address = (int)r / 3;
     karel_goto(address, 0);
     Color c = karel->GetColorBeneath();
-    c[(int)reg % 3] = value;
+    c[(int)r % 3] = value;
     karel->Paint(c);
+}
+
+static void push_stack(reg r)
+{
+    uint8_t sp = read_register(reg::sp);
+    write_address(sp, read_register(r));
+    // stack grows downwards
+    write_register(reg::sp, sp - 8);
+}
+
+static void pop_stack(reg r)
+{
+    uint8_t sp = read_register(reg::sp);
+    write_register(r, read_address(sp));
+    write_register(reg::sp, sp + 8);
+}
+
+static bool initialize()
+{
+    write_register(reg::sp, MAX_ADDRESS);
+    return true;
 }
 
 static bool Tick()
 {
     uint8_t current = program[ip];
-    switch (current)
+    switch ((instruction)current)
     {
-        case (uint8_t)instruction::EXIT:
+        case instruction::EXIT:
             MessageBoxA(karelui->GetHwnd(), "program completed", "", MB_OK);
             return false;
-        case (uint8_t)instruction::READ:
+        case instruction::READ:
         {
-            uint8_t karelptr = read_register(reg::r0);
-            write_register(reg::r0, read_address(karelptr));
+            uint8_t karelptr = read_register(reg::a0);
+            write_register(reg::a0, read_address(karelptr));
             break;
         }
-        case (uint8_t)instruction::WRITE:
+        case instruction::WRITE:
         {
-            uint8_t karelptr = read_register(reg::r0);
-            uint8_t value = read_register(reg::r1);
+            uint8_t karelptr = read_register(reg::a0);
+            uint8_t value = read_register(reg::a1);
             write_address(karelptr, value);
             break;
         }
-        case (uint8_t)instruction::MOV:
+        case instruction::MOV:
         {
             reg r = (reg)program[++ip];
             uint8_t value = program[++ip];
             write_register(r, value);
+            break;
+        }
+        case instruction::PUSH:
+        {
+            reg r = (reg)program[++ip];
+            push_stack(r);
+            break;
+        }
+        case instruction::POP:
+        {
+            reg r = (reg)program[++ip];
+            pop_stack(r);
             break;
         }
         default:
@@ -120,8 +156,7 @@ int main()
 
     try
     {
-        karelui = new KarelUI(
-            10, 10, Tick, 20, 200);
+        karelui = new KarelUI(GRID_SIZE_X, GRID_SIZE_Y, Tick, initialize, 20, 200);
         karel = karelui->GetKarel();
         return karelui->Show();
     }

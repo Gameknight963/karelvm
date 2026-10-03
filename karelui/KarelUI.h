@@ -12,6 +12,7 @@ private:
 	uint32_t squareSize;
 	inline static bool isInitialized = false;
 	std::function<bool()> onTick;
+	std::function<bool()> initialize = nullptr;
 	bool ticking = false;
 	int tickRateMs = 50;
 	HWND hwnd = nullptr;
@@ -19,6 +20,12 @@ public:
 	KarelUI(
 		int x, int y,
 		std::function<bool()> onTick,
+		int squareSize,
+		int tickRateMs);
+	KarelUI(
+		int x, int y,
+		std::function<bool()> onTick,
+		std::function<bool()> initialize,
 		int squareSize,
 		int tickRateMs);
 	~KarelUI();
