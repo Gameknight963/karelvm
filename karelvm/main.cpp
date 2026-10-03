@@ -156,14 +156,18 @@ static bool Tick()
             return false;
         case instruction::READ:
         {
-            uint32_t karelptr = read_register(reg::a0);
-            write_register(reg::a0, read_address(karelptr));
+            reg destination = static_cast<reg>(fetch_byte());
+            reg pointer = static_cast<reg>(fetch_byte());
+            uint32_t karelptr = read_register(pointer);
+            write_register(destination, read_address(karelptr));
             break;
         }
         case instruction::WRITE:
         {
-            uint32_t karelptr = read_register(reg::a0);
-            uint32_t value = read_register(reg::a1);
+            reg pointer = static_cast<reg>(fetch_byte());
+            reg source = static_cast<reg>(fetch_byte());
+            uint32_t karelptr = read_register(pointer);
+            uint32_t value = read_register(source);
             write_address(karelptr, value);
             break;
         }

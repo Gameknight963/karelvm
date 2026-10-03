@@ -9,8 +9,8 @@
 #define MOV(destination, value) static_cast<uint8_t>(instruction::MOV), static_cast<uint8_t>(reg::destination), U24_BYTES(value),
 #define PUSH(source) static_cast<uint8_t>(instruction::PUSH), static_cast<uint8_t>(reg::source),
 #define POP(destination) static_cast<uint8_t>(instruction::POP), static_cast<uint8_t>(reg::destination),
-#define READ() static_cast<uint8_t>(instruction::READ),
-#define WRITE() static_cast<uint8_t>(instruction::WRITE),
+#define READ(destination, pointer) static_cast<uint8_t>(instruction::READ), static_cast<uint8_t>(reg::destination), static_cast<uint8_t>(reg::pointer),
+#define WRITE(pointer, source) static_cast<uint8_t>(instruction::WRITE), static_cast<uint8_t>(reg::pointer), static_cast<uint8_t>(reg::source),
 #define EXIT() static_cast<uint8_t>(instruction::EXIT),
 
 constexpr uint8_t program[] = {

@@ -6,10 +6,10 @@ enum class instruction : uint32_t
 	// exit
 	EXIT = 0x00,
 
-	// write the value in a1 to the pointer in a0
+	// treat the next byte as a pointer register, and write the value in the following register to it
 	WRITE = 0x01,
 
-	// dereference a0 into a0
+	// treat the next byte as a destination register, and dereference the following pointer register into it
 	READ = 0x02,
 
 	// treat the next byte as a register, and move the following word into it
