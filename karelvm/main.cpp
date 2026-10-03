@@ -18,6 +18,9 @@ constexpr uint32_t REGISTER_ADDRESSES = 17;
 constexpr int GRID_SIZE_X = 32;
 constexpr int GRID_SIZE_Y = 32;
 constexpr int MAX_ADDRESS = GRID_SIZE_X * GRID_SIZE_Y - REGISTER_ADDRESSES;
+constexpr uint32_t PROGRAM_BYTES = sizeof(program);
+constexpr uint32_t PROGRAM_CELLS = (PROGRAM_BYTES + 2) / 3;
+static_assert(PROGRAM_CELLS <= MAX_ADDRESS, "program does not fit in Karel memory");
 
 static void karel_goto(int x, int y)
 {
@@ -87,7 +90,7 @@ static void write_register(reg r, uint32_t value)
 static void push_stack(reg r)
 {
     uint32_t sp = read_register(reg::sp);
-    if (sp == 0 || sp > MAX_ADDRESS)
+    if (sp <= PROGRAM_CELLS || sp > MAX_ADDRESS)
         throw std::out_of_range("stack overflow");
     uint32_t value = read_register(r);
     write_address(--sp, value);
@@ -98,24 +101,21 @@ static void push_stack(reg r)
 static void pop_stack(reg r)
 {
     uint32_t sp = read_register(reg::sp);
-    if (sp >= MAX_ADDRESS)
+    if (sp < PROGRAM_CELLS || sp >= MAX_ADDRESS)
         throw std::out_of_range("stack underflow");
     uint32_t value = read_address(sp);
     write_register(reg::sp, sp + 1);
     write_register(r, value);
 }
 
-static bool initialize()
-{
-    write_register(reg::sp, MAX_ADDRESS);
-    return true;
-}
-
 static uint8_t fetch_byte()
 {
-    if (ip >= sizeof(program))
+    if (ip >= PROGRAM_BYTES)
         throw std::out_of_range("unexpected end of bytecode");
-    return program[ip++];
+    uint32_t cell = read_address(ip / 3);
+    uint8_t byte = static_cast<uint8_t>(cell >> ((ip % 3) * 8));
+    ++ip;
+    return byte;
 }
 
 static uint32_t fetch_word()
@@ -124,6 +124,26 @@ static uint32_t fetch_word()
     uint32_t middle = fetch_byte();
     uint32_t high = fetch_byte();
     return low | (middle << 8) | (high << 16);
+}
+
+static bool initialize()
+{
+    // Memory layout: register cells, packed program cells, free memory/stack.
+    // Pack bytes into red, green, then blue; zero-pad the final cell.
+    for (uint32_t cell = 0; cell < PROGRAM_CELLS; ++cell)
+    {
+        uint32_t value = 0;
+        for (uint32_t channel = 0; channel < 3; ++channel)
+        {
+            uint32_t offset = cell * 3 + channel;
+            if (offset < PROGRAM_BYTES)
+                value |= uint32_t(program[offset]) << (channel * 8);
+        }
+        write_address(cell, value);
+    }
+    ip = 0;
+    write_register(reg::sp, MAX_ADDRESS);
+    return true;
 }
 
 static bool Tick()
