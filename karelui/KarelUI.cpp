@@ -2,7 +2,7 @@
 #include "KarelUI.h"
 #include "../karel-cpp/karel.h"
 #include "../karel-cpp/Color.h"
-#include "../karel-cpp/ColorToColorRef.h"
+#include "ColorToColorRef.h"
 #include <cstdint>
 #include <system_error>
 #include <functional>
@@ -117,7 +117,7 @@ void KarelUI::Draw(HDC dc) const
     {
         for (int x = 0; x < grid.x; ++x)
         {
-            SetDCBrushColor(dc, karel->GetColorAt(x, y).ToColorRef());
+            SetDCBrushColor(dc, ColorToColorRef(karel->GetColorAt(x, y)));
             Rectangle(dc, x * cellSize, y * cellSize,
                 (x + 1) * cellSize + 1, (y + 1) * cellSize + 1);
         }

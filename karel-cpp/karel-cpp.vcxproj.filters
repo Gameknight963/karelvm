@@ -9,6 +9,5 @@
     <ClInclude Include="Orientation.h" />
     <ClInclude Include="Point.h" />
     <ClInclude Include="Color.h" />
-    <ClInclude Include="ColorToColorRef.h" />
   </ItemGroup>
 </Project>
