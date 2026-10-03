@@ -44,4 +44,14 @@ enum class instruction : uint32_t
 
 	// pops the stack and jumps to that address
 	RET = 0x0C,
+
+	// treat the next byte as a register, and jump to the following word if its value is zero
+	JZ = 0x0D,
+
+	// treat the next byte as a register, and jump to the following word if its value is not zero
+	JNZ = 0x0E,
+
+	// treat the next three bytes as registers, compare the unsigned values in the last two,
+	// and store 0 if equal, 1 if greater, or 0xFFFFFF if less in the first
+	CMP = 0x0F,
 };

@@ -264,6 +264,26 @@ static bool Tick()
             ip = pop_stack();
             break;
         }
+        case instruction::JZ:
+        case instruction::JNZ:
+        {
+            reg condition = static_cast<reg>(fetch_byte());
+            uint32_t target = fetch_word();
+            bool zero = read_register(condition) == 0;
+            if ((static_cast<instruction>(current) == instruction::JZ) == zero)
+                ip = target;
+            break;
+        }
+        case instruction::CMP:
+        {
+            reg destination = static_cast<reg>(fetch_byte());
+            reg ra = static_cast<reg>(fetch_byte());
+            reg rb = static_cast<reg>(fetch_byte());
+            uint32_t a = read_register(ra);
+            uint32_t b = read_register(rb);
+            write_register(destination, a == b ? 0u : (a > b ? 1u : 0xFFFFFFu));
+            break;
+        }
         default:
         {
             std::ostringstream message;

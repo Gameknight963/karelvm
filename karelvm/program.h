@@ -19,6 +19,9 @@
 #define JMP(target) static_cast<uint8_t>(instruction::JMP), U24_BYTES(target),
 #define CALL(target) static_cast<uint8_t>(instruction::CALL), U24_BYTES(target),
 #define RET() static_cast<uint8_t>(instruction::RET),
+#define JZ(condition, target) static_cast<uint8_t>(instruction::JZ), static_cast<uint8_t>(reg::condition), U24_BYTES(target),
+#define JNZ(condition, target) static_cast<uint8_t>(instruction::JNZ), static_cast<uint8_t>(reg::condition), U24_BYTES(target),
+#define CMP(destination, ra, rb) static_cast<uint8_t>(instruction::CMP), static_cast<uint8_t>(reg::destination), static_cast<uint8_t>(reg::ra), static_cast<uint8_t>(reg::rb),
 
 constexpr uint8_t program[] = {
     MOV(s0, 2112)
@@ -39,4 +42,14 @@ constexpr uint8_t program[] = {
 #undef READ
 #undef WRITE
 #undef EXIT
+#undef ADD
+#undef SUB
+#undef MULT
+#undef DIV
+#undef JMP
+#undef CALL
+#undef RET
+#undef JZ
+#undef JNZ
+#undef CMP
 #undef U24_BYTES
